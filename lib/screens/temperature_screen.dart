@@ -57,11 +57,7 @@ class _TemperatureScreenState extends State<TemperatureScreen> {
                   ),
                   const SizedBox(height: 16),
                   // Controlli Estrusore
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  Card(
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -79,12 +75,12 @@ class _TemperatureScreenState extends State<TemperatureScreen> {
                           Container(
                             decoration: BoxDecoration(
                               color: Theme.of(context).brightness == Brightness.dark
-                                  ? const Color(0xFF2A2A2A)
-                                  : Colors.grey[100],
+                                  ? const Color(0xFF1A1A1A)
+                                  : Colors.grey[50],
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.grey[800]!
+                                    ? Colors.grey[700]!
                                     : Colors.grey[300]!,
                               ),
                             ),
@@ -154,11 +150,7 @@ class _TemperatureScreenState extends State<TemperatureScreen> {
                   ),
                   const SizedBox(height: 16),
                   // Controlli Piano Riscaldato
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  Card(
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -176,12 +168,12 @@ class _TemperatureScreenState extends State<TemperatureScreen> {
                           Container(
                             decoration: BoxDecoration(
                               color: Theme.of(context).brightness == Brightness.dark
-                                  ? const Color(0xFF2A2A2A)
-                                  : Colors.grey[100],
+                                  ? const Color(0xFF1A1A1A)
+                                  : Colors.grey[50],
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.grey[800]!
+                                    ? Colors.grey[700]!
                                     : Colors.grey[300]!,
                               ),
                             ),
@@ -265,10 +257,10 @@ class _TemperatureScreenState extends State<TemperatureScreen> {
         return Container(
           width: 80,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF2A2A2A) : Colors.grey[200],
+            color: isDark ? const Color(0xFF1A1A1A) : Colors.grey[50],
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+              color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
               width: 1,
             ),
           ),
