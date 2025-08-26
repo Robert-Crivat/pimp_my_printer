@@ -16,17 +16,14 @@ import 'settings_screen.dart';
 
 class NavigationItem {
   final Widget Function({double? size, Color? color}) icon;
-  final Widget Function({double? size, Color? color}) selectedIcon;
   final String label;
-  final String category;
+  final Widget screen;
 
   NavigationItem({
-    required Widget Function({double? size, Color? color}) icon,
-    required Widget Function({double? size, Color? color}) selectedIcon,
+    required this.icon,
     required this.label,
-    required this.category,
-  })  : icon = icon,
-        selectedIcon = selectedIcon;
+    required this.screen,
+  });
 }
 
 class MainScreen extends StatefulWidget {
@@ -40,72 +37,57 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   bool _isMenuVisible = true;
 
-  final List<Widget> _screens = [
-    const DashboardScreen(),
-    const TemperatureScreen(),
-    const ControlScreen(),
-    const CameraScreen(),
-    const FilesScreen(),
-    const MacrosScreen(),
-  ];
-
-  final List<NavigationItem> _menuItems = [
+  // Define navigation items and their corresponding screens together
+  // to prevent mismatches and improve maintainability.
+  final List<NavigationItem> _navigationItems = [
     NavigationItem(
       icon: AppIcons.dashboard,
-      selectedIcon: AppIcons.dashboard,
       label: 'Dashboard',
-      category: 'main',
+      screen: const DashboardScreen(),
     ),
     NavigationItem(
       icon: AppIcons.thermometer,
-      selectedIcon: AppIcons.thermometer,
-      label: 'Tool',
-      category: 'main',
-    ),
-    NavigationItem(
-      icon: AppIcons.thermometer,
-      selectedIcon: AppIcons.thermometer,
-      label: 'Bed',
-      category: 'main',
+      label: 'Temperature',
+      screen: const TemperatureScreen(),
     ),
     NavigationItem(
       icon: AppIcons.home,
-      selectedIcon: AppIcons.home,
       label: 'Controls',
-      category: 'main',
+      screen: const ControlScreen(),
     ),
     NavigationItem(
-      icon: AppIcons.dashboard,
-      selectedIcon: AppIcons.dashboard,
+      icon: AppIcons.webcam, // Assuming a webcam icon exists
       label: 'Webcam',
-      category: 'main',
+      screen: const CameraScreen(),
     ),
     NavigationItem(
       icon: AppIcons.download,
-      selectedIcon: AppIcons.download,
       label: 'G-Code Files',
-      category: 'main',
+      screen: const FilesScreen(),
+    ),
+    NavigationItem(
+      icon: AppIcons.macros, // Assuming a macros icon exists
+      label: 'Macros',
+      screen: const MacrosScreen(),
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    // Raggruppa gli elementi del menu per categoria
-    Map<String, List<NavigationItem>> groupedItems = {};
-    for (var item in _menuItems) {
-      if (!groupedItems.containsKey(item.category)) {
-        groupedItems[item.category] = [];
-      }
-      groupedItems[item.category]!.add(item);
-    }
-
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, _) {
+        final isDarkMode = themeProvider.isDarkMode;
+        final primaryColor = themeProvider.primaryColor;
+        final textColor = isDarkMode ? Colors.white : Colors.black87;
+        final iconColor = isDarkMode ? Colors.white : Colors.grey[600];
+        final appBarColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+        final navRailColor = isDarkMode ? const Color(0xFF252525) : Colors.grey[100];
+        final navRailBorderColor = isDarkMode ? Colors.grey[850]! : Colors.grey[300]!;
+        final navItemSelectedColor = isDarkMode ? Colors.grey[850] : Colors.grey[200];
+
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: themeProvider.isDarkMode 
-                ? const Color(0xFF1E1E1E) 
-                : Colors.white,
+            backgroundColor: appBarColor,
             elevation: 1,
             leadingWidth: 200,
             leading: Row(
@@ -118,7 +100,7 @@ class _MainScreenState extends State<MainScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: themeProvider.isDarkMode ? Colors.white : Colors.black87,
+                    color: textColor,
                   ),
                 ),
               ],
@@ -126,12 +108,10 @@ class _MainScreenState extends State<MainScreen> {
             actions: [
               IconButton(
                 icon: Icon(
-                  themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  isDarkMode ? Icons.light_mode : Icons.dark_mode,
                   size: 20,
                 ),
-                onPressed: () {
-                  themeProvider.setDarkMode(!themeProvider.isDarkMode);
-                },
+                onPressed: () => themeProvider.setDarkMode(!isDarkMode),
               ),
               IconButton(
                 icon: const Icon(Icons.settings, size: 20),
@@ -147,96 +127,75 @@ class _MainScreenState extends State<MainScreen> {
               const SizedBox(width: 8),
             ],
           ),
-      body: Stack(
-        children: [
-          Row(
+          body: Stack(
             children: [
-              Container(
-                width: 48,
-                decoration: BoxDecoration(
-                  color: themeProvider.isDarkMode ? const Color(0xFF252525) : Colors.grey[100],
-                  border: Border(
-                    right: BorderSide(
-                      color: themeProvider.isDarkMode ? Colors.grey[850]! : Colors.grey[300]!,
-                      width: 1,
-                    ),
-                  ),
-                ),
-                child: Column(
+              if (_isMenuVisible)
+                Row(
                   children: [
-                    Expanded(
+                    Container(
+                      width: 48,
+                      decoration: BoxDecoration(
+                        color: navRailColor,
+                        border: Border(
+                          right: BorderSide(color: navRailBorderColor, width: 1),
+                        ),
+                      ),
                       child: ListView.builder(
-                        itemCount: _menuItems.length,
+                        itemCount: _navigationItems.length,
                         itemBuilder: (context, index) {
-                          final item = _menuItems[index];
+                          final item = _navigationItems[index];
+                          final isSelected = _selectedIndex == index;
                           return Tooltip(
                             message: item.label,
                             preferBelow: false,
                             child: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  _selectedIndex = index;
-                                });
-                              },
+                              onTap: () => setState(() => _selectedIndex = index),
                               child: Container(
                                 height: 48,
                                 decoration: BoxDecoration(
                                   border: Border(
                                     left: BorderSide(
-                                      color: _selectedIndex == index
-                                          ? themeProvider.primaryColor
-                                          : Colors.transparent,
+                                      color: isSelected ? primaryColor : Colors.transparent,
                                       width: 3,
                                     ),
                                   ),
-                                  color: _selectedIndex == index
-                                      ? (themeProvider.isDarkMode
-                                          ? Colors.grey[850]
-                                          : Colors.grey[200])
-                                      : Colors.transparent,
+                                  color: isSelected ? navItemSelectedColor : Colors.transparent,
                                 ),
-                                child: _selectedIndex == index
-                                    ? item.selectedIcon(
-                                        size: 20,
-                                        color: themeProvider.primaryColor,
-                                      )
-                                    : item.icon(
-                                        size: 20,
-                                        color: themeProvider.isDarkMode
-                                            ? Colors.white
-                                            : Colors.grey[600],
-                                      ),
+                                child: item.icon(
+                                  size: 20,
+                                  color: isSelected ? primaryColor : (iconColor ?? Colors.white),
+                                ),
                               ),
                             ),
                           );
                         },
                       ),
                     ),
+                    Expanded(
+                      child: _navigationItems[_selectedIndex].screen,
+                    ),
                   ],
-                ),
-              ),
-              Expanded(
-                child: _screens[_selectedIndex],
+                )
+              else
+                // Show only the selected screen when the menu is not visible
+                _navigationItems[_selectedIndex].screen,
+              Consumer<WebcamProvider>(
+                builder: (context, webcamProvider, _) {
+                  if (!webcamProvider.isVisible) return const SizedBox.shrink();
+
+                  return WebcamOverlay(
+                    size: webcamProvider.defaultSize,
+                    onSizeChange: () {
+                      // Toggle menu visibility based on webcam size
+                      setState(() {
+                        _isMenuVisible = webcamProvider.defaultSize != WebcamSize.fullscreen;
+                      });
+                    },
+                  );
+                },
               ),
             ],
           ),
-          Consumer<WebcamProvider>(
-            builder: (context, webcamProvider, _) {
-              if (!webcamProvider.isVisible) return const SizedBox();
-              
-              return WebcamOverlay(
-                size: webcamProvider.defaultSize,
-                onSizeChange: () {
-                  // Se la dimensione cambia in fullscreen, nascondiamo il menu
-                  setState(() {
-                    _isMenuVisible = webcamProvider.defaultSize != WebcamSize.fullscreen;
-                  });
-                },
-              );
-            },
-          ),
-        ],
-      ),
         );
       },
     );
