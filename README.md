@@ -1,127 +1,127 @@
 # Pimp My Printer 🖨️
 
-Un'applicazione Flutter multipiattaforma per il controllo e la gestione avanzata delle stampanti 3D. Monitora e controlla le tue stampanti 3D da qualsiasi dispositivo, prepara i tuoi modelli per la stampa e visualizza in tempo reale il processo di stampa.
+A cross-platform Flutter application for advanced control and management of 3D printers. Monitor and control your 3D printers from any device, prepare your models for printing, and view the printing process in real-time.
 
-## 🌟 Caratteristiche Principali
+## 🌟 Key Features
 
-- **Dashboard unificata** - Controlla più stampanti da un'unica interfaccia
-- **Visualizzatore 3D avanzato** - Visualizza modelli STL con supporto per rotazione, zoom e manipolazione
-- **Slicer integrato** - Prepara i tuoi modelli 3D per la stampa direttamente nell'app
-- **Monitoraggio in tempo reale** - Verifica temperature, progresso e stato della stampante
-- **Controllo remoto** - Invia comandi e gestisci la tua stampante da qualsiasi luogo
-- **Compatibilità multipiattaforma** - Funziona su Android, iOS, Web, Windows, macOS e Linux
+- **Unified Dashboard** - Control multiple printers from a single interface
+- **Advanced 3D Viewer** - View STL models with support for rotation, zoom, and manipulation
+- **Integrated Slicer** - Prepare your 3D models for printing directly in the app
+- **Real-time Monitoring** - Check temperatures, progress, and printer status
+- **Remote Control** - Send commands and manage your printer from anywhere
+- **Cross-platform Compatibility** - Works on Android, iOS, Web, Windows, macOS, and Linux
 
-## 📱 Screenshot
+## 📱 Screenshots
 
-*Screenshot saranno aggiunti presto*
+*Screenshots will be added soon*
 
-## 🚀 Iniziare
+## 🚀 Getting Started
 
-### Prerequisiti
+### Prerequisites
 
-- [Flutter](https://flutter.dev/docs/get-started/install) (versione 3.9.0 o superiore)
-- Un dispositivo/emulatore Android, iOS o un browser web
+- [Flutter](https://flutter.dev/docs/get-started/install) (version 3.9.0 or higher)
+- An Android/iOS device/emulator or a web browser
 
-### Installazione
+### Installation
 
-1. Clona questo repository:
+1. Clone this repository:
    ```bash
    git clone https://github.com/Robert-Crivat/pimp_my_printer.git
    ```
 
-2. Naviga nella directory del progetto:
+2. Navigate to the project directory:
    ```bash
    cd pimp_my_printer
    ```
 
-3. Installa le dipendenze:
+3. Install dependencies:
    ```bash
    flutter pub get
    ```
 
-4. Esegui l'applicazione:
+4. Run the application:
    ```bash
    flutter run
    ```
 
-## 📋 Componenti dell'App
+## 📋 App Components
 
-### Schermata Principale
+### Main Screen
 
-L'applicazione include diverse schermate accessibili dal menu laterale:
+The application includes several screens accessible from the side menu:
 
-- **Dashboard** - Panoramica generale dello stato della stampante
-- **Temperature** - Controllo e monitoraggio temperature dell'ugello e del piano
-- **Controlli** - Movimentazione manuale degli assi e altre operazioni
-- **Webcam** - Visualizzazione in tempo reale della stampante
-- **Slicer** - Preparazione dei modelli 3D per la stampa
-- **File G-Code** - Gestione dei file di stampa
-- **Macro** - Comandi personalizzati per operazioni frequenti
-- **Impostazioni** - Configurazione dell'applicazione
+- **Dashboard** - General overview of printer status
+- **Temperature** - Control and monitoring of hotend and bed temperatures
+- **Controls** - Manual axis movement and other operations
+- **Webcam** - Real-time visualization of the printer
+- **Slicer** - Preparation of 3D models for printing
+- **G-Code Files** - Management of print files
+- **Macros** - Custom commands for frequent operations
+- **Settings** - Application configuration
 
-### Visualizzatore 3D
+### 3D Viewer
 
-Il componente `STL3DViewer` consente di:
+The `STL3DViewer` component allows you to:
 
-- Caricare e visualizzare modelli STL
-- Ruotare, zoomare e manipolare il modello
-- Visualizzare il modello con illuminazione realistica
-- Funziona sia in ambiente mobile che web
+- Load and view STL models
+- Rotate, zoom, and manipulate the model
+- View the model with realistic lighting
+- Works in both mobile and web environments
 
 ### Slicer
 
-Lo Slicer integrato permette di:
+The integrated Slicer allows you to:
 
-- Caricare modelli STL, OBJ, 3MF o AMF
-- Configurare parametri di stampa (altezza layer, temperatura, velocità)
-- Visualizzare anteprima del modello
-- Generare G-code pronto per la stampa
+- Load STL, OBJ, 3MF, or AMF models
+- Configure print parameters (layer height, temperature, speed)
+- Preview the model
+- Generate print-ready G-code
 
-## 🛠️ Tecnologie Utilizzate
+## 🛠️ Technologies Used
 
-- **Flutter** - Framework UI cross-platform
-- **Provider** - Gestione dello stato
-- **Custom Painters** - Rendering avanzato per il visualizzatore 3D
-- **WebSockets** - Comunicazione in tempo reale con la stampante
-- **File Picker** - Selezione di modelli 3D
+- **Flutter** - Cross-platform UI framework
+- **Provider** - State management
+- **Custom Painters** - Advanced rendering for the 3D viewer
+- **WebSockets** - Real-time communication with the printer
+- **File Picker** - Selection of 3D models
 
-## 🔄 Architettura
+## 🔄 Architecture
 
-L'applicazione è strutturata seguendo un'architettura a componenti:
+The application is structured following a component-based architecture:
 
-- **Providers** - Gestiscono lo stato dell'applicazione (tema, connessione, ecc.)
-- **Screens** - Interfacce utente principali dell'applicazione
-- **Widgets** - Componenti riutilizzabili (visualizzatore 3D, controlli, ecc.)
-- **Utils** - Funzioni di utilità e helper
-- **Models** - Strutture dati per rappresentare entità come stampanti, file, ecc.
+- **Providers** - Manage the application state (theme, connection, etc.)
+- **Screens** - Main user interfaces of the application
+- **Widgets** - Reusable components (3D viewer, controls, etc.)
+- **Utils** - Utility functions and helpers
+- **Models** - Data structures to represent entities like printers, files, etc.
 
-## 🤝 Contribuire
+## 🤝 Contributing
 
-I contributi sono benvenuti! Se desideri contribuire:
+Contributions are welcome! If you would like to contribute:
 
-1. Fai un fork del repository
-2. Crea un branch per la tua funzionalità (`git checkout -b feature/amazing-feature`)
-3. Fai commit delle tue modifiche (`git commit -m 'Aggiungi una funzionalità incredibile'`)
-4. Fai push al branch (`git push origin feature/amazing-feature`)
-5. Apri una Pull Request
+1. Fork the repository
+2. Create a branch for your feature (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add an amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📝 Roadmap
 
-- [ ] Supporto per più protocolli di stampanti (OctoPrint, Klipper, Marlin)
-- [ ] Editor G-code integrato
-- [ ] Supporto per telecamere multiple
-- [ ] Notifiche push per eventi della stampante
-- [ ] Supporto per la stampa su più materiali
+- [ ] Support for multiple printer protocols (OctoPrint, Klipper, Marlin)
+- [ ] Integrated G-code editor
+- [ ] Support for multiple cameras
+- [ ] Push notifications for printer events
+- [ ] Support for multi-material printing
 
-## 📄 Licenza
+## 📄 License
 
-Questo progetto è concesso in licenza con la Licenza MIT - vedere il file [LICENSE](LICENSE) per dettagli.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👏 Ringraziamenti
+## 👏 Acknowledgments
 
-- Grazie a tutti i contributori che hanno investito tempo e impegno in questo progetto
-- Grazie alla community Flutter per il supporto e le risorse condivise
+- Thanks to all contributors who have invested time and effort in this project
+- Thanks to the Flutter community for support and shared resources
 
 ---
 
-Realizzato con ❤️ per la community di stampa 3D.
+Made with ❤️ for the 3D printing community.
