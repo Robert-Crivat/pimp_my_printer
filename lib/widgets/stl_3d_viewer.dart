@@ -327,7 +327,10 @@ class _STL3DViewerState extends State<STL3DViewer>
     
     if (maxDimension == 0) return 1.0;
     
-    return 2.0 / maxDimension; // Scala per adattare nell'area di visualizzazione
+    // Assicuriamoci che il modello sia sempre ben visibile
+    // Un valore più alto qui renderà il modello più grande nella vista
+    // 5.0 è un valore più aggressivo per assicurarsi che il modello sia chiaramente visibile
+    return 5.0 / maxDimension;
   }
 
   Future<void> _createDemoModel() async {
@@ -452,68 +455,141 @@ class _STL3DViewerState extends State<STL3DViewer>
             });
           }
         },
-        child: GestureDetector(
-          onPanStart: (details) {
-            _autoRotate = false;
-            _rotationController.stop();
-            _lastPanPoint = details.localPosition;
-          },
-          onPanUpdate: (details) {
-            setState(() {
-              final delta = details.localPosition - _lastPanPoint;
-              _userRotationY += delta.dx * 0.01;
-              _userRotationX += delta.dy * 0.01;
-              _userRotationX = _userRotationX.clamp(-math.pi / 2, math.pi / 2);
-              _lastPanPoint = details.localPosition;
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            // Sfondo più chiaro e professionale
+            color: Theme.of(context).brightness == Brightness.dark 
+              ? const Color(0xFF2A2A2A)  // Grigio scuro per tema scuro
+              : const Color(0xFFF8F9FA), // Grigio molto chiaro per tema chiaro
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: GestureDetector(
+            onDoubleTap: () {
+              setState(() {
+                _userRotationX = 0.0;
+                _userRotationY = 0.0;
+                _scale = 1.0;
+                _autoRotate = true;
+                _rotationController.repeat();
+              });
+            },
+            onPanStart: (details) {
               _autoRotate = false;
               _rotationController.stop();
-            });
-          },
-          onDoubleTap: () {
-            setState(() {
-              _userRotationX = 0.0;
-              _userRotationY = 0.0;
-              _scale = 1.0;
-              _autoRotate = true;
-              _rotationController.repeat();
-            });
-          },
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              // Sfondo più chiaro e professionale
-              color: Theme.of(context).brightness == Brightness.dark 
-                ? const Color(0xFF2A2A2A)  // Grigio scuro per tema scuro
-                : const Color(0xFFF8F9FA), // Grigio molto chiaro per tema chiaro
-              borderRadius: BorderRadius.circular(8),
-            ),
+              _lastPanPoint = details.localPosition;
+            },
+            onPanUpdate: (details) {
+              setState(() {
+                final delta = details.localPosition - _lastPanPoint;
+                _userRotationY += delta.dx * 0.01;
+                _userRotationX -= delta.dy * 0.01; // Invertiamo il movimento Y per un controllo più intuitivo
+                
+                // Limita la rotazione verticale per evitare capovolgimenti
+                _userRotationX = _userRotationX.clamp(-math.pi / 2 + 0.1, math.pi / 2 - 0.1);
+                
+                _lastPanPoint = details.localPosition;
+              });
+            },
             child: Stack(
               children: [
-                // Sfondo con griglia 3D
+                // Sfondo con griglia semplice (rettangolo piatto)
                 CustomPaint(
                   size: Size.infinite,
-                  painter: GridPainter(
-                    rotationX: _userRotationX,
-                    rotationY: _userRotationY,
-                    rotationAnimation: _rotationController,
-                    scale: _scale,
+                  painter: SimpleGridPainter(
                     isDark: Theme.of(context).brightness == Brightness.dark,
                   ),
                 ),
-                // Modello 3D
+                // Modello 3D con scala fissa
                 CustomPaint(
+                  size: Size.infinite,
                   painter: STL3DPainter(
                     triangles: _triangles,
                     rotationX: _userRotationX,
                     rotationY: _userRotationY,
                     rotationAnimation: _rotationController,
-                    scale: _scale,
+                    scale: _scale * 10.0, // Forziamo una scala più grande per assicurarci che il modello sia visibile
                     bounds: _bounds,
                     isDark: Theme.of(context).brightness == Brightness.dark,
                   ),
                 ),
+                // Visualizza i controlli a schermo per il 3D
+                if (widget.showControls)
+                  Positioned(
+                    bottom: 16,
+                    right: 16,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildRoundedIconButton(
+                          Icons.zoom_in, 
+                          () => setState(() {
+                            _scale = (_scale * 1.2).clamp(0.1, 10.0);
+                          })
+                        ),
+                        const SizedBox(height: 8),
+                        _buildRoundedIconButton(
+                          Icons.zoom_out,
+                          () => setState(() {
+                            _scale = (_scale / 1.2).clamp(0.1, 10.0);
+                          })
+                        ),
+                        const SizedBox(height: 8),
+                        _buildRoundedIconButton(
+                          _autoRotate ? Icons.pause : Icons.play_arrow,
+                          () => setState(() {
+                            _autoRotate = !_autoRotate;
+                            if (_autoRotate) {
+                              _rotationController.repeat();
+                            } else {
+                              _rotationController.stop();
+                            }
+                          })
+                        ),
+                        const SizedBox(height: 8),
+                        _buildRoundedIconButton(
+                          Icons.restart_alt,
+                          () => setState(() {
+                            _userRotationX = 0.0;
+                            _userRotationY = 0.0;
+                            _scale = 1.0;
+                            _autoRotate = false;
+                            _rotationController.stop();
+                          })
+                        ),
+                      ],
+                    ),
+                  ),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildRoundedIconButton(IconData icon, VoidCallback onPressed) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withAlpha(180),
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(50),
+            blurRadius: 4,
+          )
+        ]
+      ),
+      child: ClipOval(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onPressed,
+            child: SizedBox(
+              width: 40,
+              height: 40,
+              child: Icon(icon, size: 20),
             ),
           ),
         ),
@@ -1018,10 +1094,10 @@ class STL3DPainter extends CustomPainter {
     if (triangles.isEmpty) return;
 
     final center = Offset(size.width / 2, size.height / 2);
-    final viewScale = math.min(size.width, size.height) * 0.35 * scale;
+    final viewScale = math.min(size.width, size.height) * scale;
     
-    // Calcola la rotazione totale
-    final totalRotationY = rotationY + (rotationAnimation.value * 2 * math.pi);
+    // Calcola la rotazione totale e usa effettivamente questa variabile
+    final actualRotationY = rotationY + (rotationAnimation.value * 2 * math.pi);
     
     // Centra il modello
     final modelCenter = bounds?.center ?? const STLVector3(0, 0, 0);
@@ -1029,15 +1105,23 @@ class STL3DPainter extends CustomPainter {
     // Trasforma e ordina i triangoli per il depth sorting
     final transformedTriangles = <_TransformedTriangle>[];
     
+    // Usiamo un fattore di scale per assicurarci che il modello sia visibile
+    final modelScaleFactor = 2.0;
+    
     for (final triangle in triangles) {
-      final t1 = _transformPoint(triangle.v1 - modelCenter, rotationX, totalRotationY, viewScale, center);
-      final t2 = _transformPoint(triangle.v2 - modelCenter, rotationX, totalRotationY, viewScale, center);
-      final t3 = _transformPoint(triangle.v3 - modelCenter, rotationX, totalRotationY, viewScale, center);
+      // Applichiamo un fattore di scala prima della trasformazione
+      final v1 = (triangle.v1 - modelCenter) * modelScaleFactor;
+      final v2 = (triangle.v2 - modelCenter) * modelScaleFactor;
+      final v3 = (triangle.v3 - modelCenter) * modelScaleFactor;
+      
+      final t1 = _transformPoint(v1, rotationX, actualRotationY, viewScale, center);
+      final t2 = _transformPoint(v2, rotationX, actualRotationY, viewScale, center);
+      final t3 = _transformPoint(v3, rotationX, actualRotationY, viewScale, center);
       
       final avgZ = (t1.z + t2.z + t3.z) / 3;
       
       // Calcola la normale trasformata per il lighting
-      final transformedNormal = _transformNormal(triangle.normal, rotationX, totalRotationY);
+      final transformedNormal = _transformNormal(triangle.normal, rotationX, actualRotationY);
       
       transformedTriangles.add(_TransformedTriangle(
         Offset(t1.x, t1.y),
@@ -1078,12 +1162,10 @@ class STL3DPainter extends CustomPainter {
       final intensity = (ambient + diffuse1 + diffuse2 + specular1).clamp(0.0, 1.0);
       
       // Applica intensità al colore base
-      final finalColor = Color.fromRGBO(
-        (baseColor.red * intensity).round(),
-        (baseColor.green * intensity).round(), 
-        (baseColor.blue * intensity).round(),
-        1.0
-      );
+      final int r = (baseColor.red * intensity).round();
+      final int g = (baseColor.green * intensity).round();
+      final int b = (baseColor.blue * intensity).round();
+      final finalColor = Color.fromRGBO(r, g, b, 1.0);
       
       final trianglePaint = Paint()
         ..color = finalColor
@@ -1093,7 +1175,7 @@ class STL3DPainter extends CustomPainter {
       
       // Outline delicato per definizione geometrica (stile OrcaSlicer)
       final outlinePaint = Paint()
-        ..color = Colors.black.withOpacity(0.1)
+        ..color = Colors.black.withAlpha(25)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 0.2;
       
@@ -1102,26 +1184,27 @@ class STL3DPainter extends CustomPainter {
   }
 
   STLVector3 _transformPoint(STLVector3 point, double rotX, double rotY, double scale, Offset center) {
-    // Rotazione Y
+    // Rotazione Y (attorno all'asse verticale)
     final cosY = math.cos(rotY);
     final sinY = math.sin(rotY);
     final x1 = point.x * cosY - point.z * sinY;
     final z1 = point.x * sinY + point.z * cosY;
     
-    // Rotazione X
+    // Rotazione X (attorno all'asse orizzontale)
     final cosX = math.cos(rotX);
     final sinX = math.sin(rotX);
     final y1 = point.y * cosX - z1 * sinX;
     final z2 = point.y * sinX + z1 * cosX;
     
-    // Proiezione prospettica
-    final perspective = 5.0;
-    final projectedX = x1 / (1 + z2 / perspective);
-    final projectedY = y1 / (1 + z2 / perspective);
+    // Proiezione quasi-ortografica per un aspetto tecnico come OrcaSlicer
+    // Usiamo un approccio più semplice senza prospettiva
+    
+    // Applica un offset verticale per posizionare il modello più in alto rispetto alla griglia
+    final verticalOffset = -40.0; // Più negativo = più in alto
     
     return STLVector3(
-      center.dx + projectedX * scale,
-      center.dy - projectedY * scale, // Inverti Y per sistema di coordinate corretto
+      center.dx + x1 * scale,
+      center.dy - y1 * scale + verticalOffset, // Inverti Y e aggiungi offset
       z2,
     );
   }
@@ -1144,10 +1227,6 @@ class STL3DPainter extends CustomPainter {
 
 
 
-  void _drawAxes(Canvas canvas, Offset center, double length) {
-    // Questo metodo non è più necessario perché la griglia ha i suoi assi
-  }
-
   @override
   bool shouldRepaint(STL3DPainter oldDelegate) {
     return oldDelegate.rotationX != rotationX ||
@@ -1165,67 +1244,84 @@ class _TransformedTriangle {
   const _TransformedTriangle(this.p1, this.p2, this.p3, this.avgZ, this.normal);
 }
 
-class GridPainter extends CustomPainter {
-  final double rotationX;
-  final double rotationY;
-  final Animation<double> rotationAnimation;
-  final double scale;
+/// Implementazione semplice di una griglia fissa (non ruota)
+class SimpleGridPainter extends CustomPainter {
   final bool isDark;
 
-  GridPainter({
-    required this.rotationX,
-    required this.rotationY,
-    required this.rotationAnimation,
-    required this.scale,
+  SimpleGridPainter({
     required this.isDark,
-  }) : super(repaint: rotationAnimation);
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final gridSize = math.min(size.width, size.height) * 0.4 * scale;
+    final gridSize = math.min(size.width, size.height) * 0.45; // Griglia leggermente più grande
     
-    // Calcola la rotazione totale
-    final totalRotationY = rotationY + (rotationAnimation.value * 2 * math.pi);
+    // Colori della griglia
+    final gridColor = isDark ? Colors.white.withAlpha(15) : Colors.black.withAlpha(15);
+    final axisColor = isDark ? Colors.white.withAlpha(30) : Colors.black.withAlpha(30);
+    final borderColor = isDark ? Colors.white.withAlpha(40) : Colors.black.withAlpha(40);
     
-    // Disegna la griglia
-    final paint = Paint()
-      ..color = isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.1)
+    // Disegna la griglia piatta (stile OrcaSlicer)
+    final gridPaint = Paint()
+      ..color = gridColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.5;
     
-    for (double i = -gridSize; i <= gridSize; i += 10) {
-      // Linee orizzontali
-      canvas.drawLine(
-        Offset(-gridSize, i) + center,
-        Offset(gridSize, i) + center,
-        paint,
-      );
-      
-      // Linee verticali
-      canvas.drawLine(
-        Offset(i, -gridSize) + center,
-        Offset(i, gridSize) + center,
-        paint,
-      );
-    }
-    
-    // Disegna i bordi della griglia
+    // Disegna il bordo esterno
     final borderPaint = Paint()
-      ..color = isDark ? Colors.white.withOpacity(0.2) : Colors.black.withOpacity(0.2)
+      ..color = borderColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
-    
+      
     canvas.drawRect(
       Rect.fromCenter(center: center, width: gridSize * 2, height: gridSize * 2),
       borderPaint,
     );
+    
+    // Disegna le linee della griglia
+    final gridStep = 20.0; // Spaziatura maggiore per una griglia più pulita
+    for (double i = center.dx - gridSize; i <= center.dx + gridSize; i += gridStep) {
+      // Linee verticali
+      canvas.drawLine(
+        Offset(i, center.dy - gridSize),
+        Offset(i, center.dy + gridSize),
+        gridPaint,
+      );
+    }
+    
+    for (double i = center.dy - gridSize; i <= center.dy + gridSize; i += gridStep) {
+      // Linee orizzontali
+      canvas.drawLine(
+        Offset(center.dx - gridSize, i),
+        Offset(center.dx + gridSize, i),
+        gridPaint,
+      );
+    }
+    
+    // Disegna gli assi X e Y più evidenziati
+    final axisPaint = Paint()
+      ..color = axisColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+      
+    // Asse X
+    canvas.drawLine(
+      Offset(center.dx - gridSize, center.dy),
+      Offset(center.dx + gridSize, center.dy),
+      axisPaint,
+    );
+    
+    // Asse Y
+    canvas.drawLine(
+      Offset(center.dx, center.dy - gridSize),
+      Offset(center.dx, center.dy + gridSize),
+      axisPaint,
+    );
   }
 
   @override
-  bool shouldRepaint(GridPainter oldDelegate) {
-    return oldDelegate.rotationX != rotationX ||
-           oldDelegate.rotationY != rotationY ||
-           oldDelegate.scale != scale;
+  bool shouldRepaint(SimpleGridPainter oldDelegate) {
+    return oldDelegate.isDark != isDark;
   }
 }

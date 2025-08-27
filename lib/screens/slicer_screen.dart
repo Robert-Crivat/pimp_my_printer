@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import '../providers/theme_provider.dart';
-import '../widgets/grid_painter.dart';
 import '../widgets/stl_3d_viewer.dart';
 
 class SlicerScreen extends StatefulWidget {
