@@ -10,6 +10,7 @@ import 'control_screen.dart';
 import 'camera_screen.dart';
 import 'files_screen.dart';
 import 'macros_screen.dart';
+import 'slicer_screen.dart';
 import 'settings_screen.dart';
 
 //TODO : ROB svg : https://www.svgrepo.com/vectors/3d-printer/
@@ -59,6 +60,11 @@ class _MainScreenState extends State<MainScreen> {
       icon: AppIcons.webcam, // Assuming a webcam icon exists
       label: 'Webcam',
       screen: const CameraScreen(),
+    ),
+    NavigationItem(
+      icon: AppIcons.slicer,
+      label: 'Slicer',
+      screen: const SlicerScreen(),
     ),
     NavigationItem(
       icon: AppIcons.download,

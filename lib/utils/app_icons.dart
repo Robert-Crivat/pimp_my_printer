@@ -50,4 +50,10 @@ class AppIcons {
     height: size ?? 24,
     colorFilter: ColorFilter.mode(color ?? Colors.white, BlendMode.srcIn),
   );
+
+  static Widget slicer({double? size, Color? color}) => Icon(
+    Icons.view_in_ar,
+    size: size ?? 24,
+    color: color ?? Colors.white,
+  );
 }
