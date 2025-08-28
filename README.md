@@ -21,6 +21,7 @@ A cross-platform Flutter application for advanced control and management of 3D p
 
 - [Flutter](https://flutter.dev/docs/get-started/install) (version 3.9.0 or higher)
 - An Android/iOS device/emulator or a web browser
+- Python 3.9+ (per l'API di generazione G-code)
 
 ### Installation
 
@@ -42,6 +43,31 @@ A cross-platform Flutter application for advanced control and management of 3D p
 4. Run the application:
    ```bash
    flutter run
+   ```
+
+### API Setup (Optional)
+
+For advanced G-code generation, you can run the Python API:
+
+1. Navigate to the API directory:
+   ```bash
+   cd api
+   ```
+
+2. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Run the API server:
+   ```bash
+   python app.py
+   ```
+
+4. Alternatively, run with Docker:
+   ```bash
+   docker build -t pimp-my-printer-api .
+   docker run -p 5000:5000 pimp-my-printer-api
    ```
 
 ## 📋 App Components
@@ -76,6 +102,17 @@ The integrated Slicer allows you to:
 - Configure print parameters (layer height, temperature, speed)
 - Preview the model
 - Generate print-ready G-code
+- Use Python API for advanced G-code generation (optional)
+
+### API
+
+The Python-based API provides:
+
+- Server-side STL processing for efficient G-code generation
+- Support for various infill patterns and printing parameters
+- Statistical analysis of 3D models
+- Docker support for easy deployment
+- Full documentation in the `/api` directory
 
 ## 🛠️ Technologies Used
 
@@ -84,6 +121,9 @@ The integrated Slicer allows you to:
 - **Custom Painters** - Advanced rendering for the 3D viewer
 - **WebSockets** - Real-time communication with the printer
 - **File Picker** - Selection of 3D models
+- **Flask** - Python web framework for API
+- **Trimesh** - Processing 3D models in Python
+- **Docker** - Containerization for API deployment
 
 ## 🔄 Architecture
 

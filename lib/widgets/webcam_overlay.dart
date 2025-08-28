@@ -154,7 +154,6 @@ class _WebcamOverlayState extends State<WebcamOverlay> {
               onDragEnd: (details) {
                 final screenSize = MediaQuery.of(context).size;
                 final safeArea = MediaQuery.of(context).padding;
-                
                 setState(() {
                   // Mantieni la webcam all'interno dei limiti dello schermo
                   _position = Offset(
