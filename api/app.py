@@ -368,7 +368,6 @@ def calculate_model_stats(mesh):
 def generate_gcode_preview(mesh, params, stats):
     """
     Genera un'anteprima del G-code (solo intestazione e prime righe)
-    
     Args:
         mesh: Modello 3D in formato trimesh
         params: Parametri di stampa

@@ -220,6 +220,17 @@ class _LayerPreviewWidgetState extends State<LayerPreviewWidget>
     );
   }
 
+  Widget _buildForeground() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black
+            : Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+      ),
+    );
+  }
+
   Widget _buildLayerSlider() {
     return Card(
       child: Padding(
